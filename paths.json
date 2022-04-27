@@ -1,0 +1,4 @@
+{
+    "gmsh": "/Applications/Gmsh.app/Contents/MacOS/gmsh",
+    "mmg": "../../bin/mmgs_O3"
+}
