@@ -1,6 +1,7 @@
 import meshio
 import os
 
+import subprocess
 
 def mesh_adapt(mmg_path, gmsh_path, control_type):
     print("Remeshing....")

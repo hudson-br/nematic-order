@@ -51,6 +51,7 @@ from ufl import (
 )
 import meshio
 from mesh_adapt import mesh_adapt
+import subprocess
 
 SHEAR_PENALTY = Constant(100.0)
 
@@ -807,6 +808,9 @@ class ActiveShell:
             ffile.read(new_mesh)
         self.mesh = new_mesh
         self.adapt_and_interpolate()
+    def write_mesh_from_xdmf(self,i):
+        subprocess.call(["meshio convert --input-format xdmf --output-format medit mesh.xdmf" + " output/mesh/mesh" + str(i).zfill(5) + ".mesh"],shell=True)
+
 
     def adapt_and_interpolate(self):
 

@@ -37,6 +37,11 @@ output_dir = "output/"
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
+output_dir_mesh = "output/mesh/"
+if not os.path.exists(output_dir_mesh):
+    os.makedirs(output_dir_mesh)
+
+
 # Opening JSON file
 with open("../../paths.json") as json_file:
     paths = json.load(json_file)
@@ -112,6 +117,9 @@ def radius(problem):
     return assemble((2.0 / pi) * dss(1)(domain=problem.mesh))
 
 
+
+
+
 initial_volume = assemble(1.0 * dx(domain=mesh)) / 3
 print("Initial volume:", initial_volume)
 
@@ -159,6 +167,9 @@ problem.write(
     energies=True,
 )
 i = 0
+
+problem.write_mesh_from_xdmf(i)
+
 radius_old = 1.0
 d_radius = 1
 while time < Time:
@@ -174,6 +185,11 @@ while time < Time:
     d_radius = abs(current_radius - radius_old)
     print("Variation in radius: {}".format(d_radius))
     radius_old = current_radius
+    
+    # cwd = os.getcwd()
+    # print(cwd)
+    # write_mesh_from_xdmf(i)
+    
 
     problem.write(
         time + dt,
@@ -185,6 +201,8 @@ while time < Time:
         activity=True,
         energies=True,
     )
+    if i%2==0:
+        problem.write_mesh_from_xdmf(i)
     print(
         "rmin={}, rmax={}, hmin={}, hmax={}".format(
             problem.mesh.rmin(),
