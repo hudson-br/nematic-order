@@ -1,7 +1,7 @@
 [simulation]
 path = 
-Time_max = 36
-timestep = 25e-3
+Time_max = 20
+timestep = 20e-3
 output_dir = 
 polymerization = 1
 HyperOsmotic = 0
@@ -24,3 +24,9 @@ radius = 2.1
 Hausdorff_distance = 0.001
 hsiz = 0.02
 remeshing_frequency = 2
+
+[nematics]
+coupling_parameter = 2
+rotational_viscosity = 0.5
+elastic_frank_constant = 0.02
+inverse_susceptibility = 0.5

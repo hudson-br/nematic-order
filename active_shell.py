@@ -341,9 +341,11 @@ class ActiveShell:
         self.solver.parameters["method"] = "newtonls"
         self.solver.parameters["maximum_iterations"] = 20
         self.solver.parameters["linear_solver"] = "lu"
-        self.solver.parameters["absolute_tolerance"] = 1e-6
-        self.solver.parameters["relative_tolerance"] = 1e-6
-        self.solver.parameters["report"] = False
+        # self.solver.parameters["linear_solver"] = "petsc"
+        # self.solver.parameters["preconditioner"] = "ilu"
+        self.solver.parameters["absolute_tolerance"] = 1e-3
+        self.solver.parameters["relative_tolerance"] = 1e-3
+        # self.solver.parameters["report"] = False
 
     def set_shape(self):
         initial_shape = Expression(("x[0]", "x[1]", "x[2]"), degree=1)

@@ -20,6 +20,10 @@ import meshio
 import configreader
 import json
 
+import time as ttime
+start = ttime.time()
+
+
 # System parameters
 
 parameters["form_compiler"]["quadrature_degree"] = 4
@@ -224,7 +228,7 @@ while time < Time:
             print("Hausdorff distance")
 
     if (
-        current_radius < 0.1 or d_radius < 2.e-6
+        current_radius < 0.25 or d_radius < 2.e-6
     ):  # If the furrow radius is smaller than twice the thickness it means that it should have stopped dividing!
         problem.write(
             time + dt,
@@ -246,3 +250,6 @@ r=open('output/final_radius.csv','w')
 np.savetxt(r, np.column_stack((zeta,radius(problem))),delimiter=',')
 r.close()
 print("It ended at iteration {}, and Time {}".format(i, time))
+
+end = ttime.time()
+print("total time: ", end - start)
