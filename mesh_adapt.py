@@ -10,7 +10,7 @@ def mesh_adapt(mmg_path, gmsh_path, control_type):
         "meshio convert --input-format xdmf --output-format medit mesh.xdmf mesh.mesh"
     )
 
-    dist = 0.002  # controls the optimized mesh resolution (see https://www.mmgtools.org/mmg-remesher-try-mmg/mmg-remesher-options/mmg-remesher-option-hausd)
+    dist = 0.001  # controls the optimized mesh resolution (see https://www.mmgtools.org/mmg-remesher-try-mmg/mmg-remesher-options/mmg-remesher-option-hausd)
     # call mmgs with mesh optimization and Hausdorff distance
     if control_type == "hausd":
         os.system(

@@ -102,7 +102,7 @@ class ActiveShell:
         self.mesh = mesh
         self.mmesh = mmesh
         self.thick = thick
-        self.mu = mu
+        self.mu = mu            
         self.basal = basal
         self.zeta = zeta
         self.gaussian_width = gaussian_width
@@ -116,14 +116,15 @@ class ActiveShell:
         self.set_solver()
         self.set_functions_space()
         self.thickness.interpolate(thick)
+        
+        # Nematic parameters
+        self.nu_ = nu_          # coupling parameters
+        self.gamma_ = gamma_    # rotational viscosity
+        self.L_ = L_            # elastic frank constant
+        self.chi_ = chi_        # inverse susceptibility
 
-        self.nu_ = nu_
-        self.gamma_ = gamma_
-        self.L_ = L_
-        self.chi_ = chi_
-
-        self.dV_expr = dV
-        self.paths = paths
+        self.dV_expr = dV       # expression for volume control
+        self.paths = paths      # paths to gmsh and mmg 
 
         self.initialize()
         self.fname = fname
@@ -340,11 +341,11 @@ class ActiveShell:
         self.solver = PETScSNESSolver()
         self.solver.parameters["method"] = "newtonls"
         self.solver.parameters["maximum_iterations"] = 20
-        self.solver.parameters["linear_solver"] = "lu"
-        # self.solver.parameters["linear_solver"] = "petsc"
+        # self.solver.parameters["linear_solver"] = "lu"
+        self.solver.parameters["linear_solver"] = "petsc"
         # self.solver.parameters["preconditioner"] = "ilu"
-        self.solver.parameters["absolute_tolerance"] = 1e-3
-        self.solver.parameters["relative_tolerance"] = 1e-3
+        self.solver.parameters["absolute_tolerance"] = 1e-2
+        self.solver.parameters["relative_tolerance"] = 1e-2
         # self.solver.parameters["report"] = False
 
     def set_shape(self):

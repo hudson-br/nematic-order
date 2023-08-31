@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import configreader
 
 
-path = '/Users/morpho/Desktop/data'
+path = '/Users/morpho/TURLIERLAB Dropbox/Hudson Rocha/Postdoc/filament-orientation/data/correlation-length'
 os.chdir(path)
 cwd = os.getcwd()
 
@@ -15,12 +15,15 @@ radius = []
 time = []
 for elem in os.listdir(cwd):
     if elem.startswith("run"):
-        print(elem)
-        f = np.genfromtxt(elem+ '/output/data.csv', delimiter=';', unpack=True)
-        radius = np.append(radius,f[2][-1])
-        C = configreader.Config()
-        config = C.read(elem+  "/config.conf")
-        contractility = np.append(contractility, float(config["parameters"]["contractility_strength"]))
+        try:
+            print(elem)
+            f = np.genfromtxt(elem+ '/output/data.csv', delimiter=';', unpack=True)
+            radius = np.append(radius,f[2][-1])
+            C = configreader.Config()
+            config = C.read(elem+  "/config.conf")
+            contractility = np.append(contractility, float(config["parameters"]["contractility_strength"]))
+        except:
+            pass
 
 os.chdir(path)
 cwd = os.getcwd()

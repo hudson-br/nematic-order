@@ -11,6 +11,7 @@ from dolfin import (
     ds,
     assemble,
     dx,
+    cells,
 )
 from ufl import as_tensor, pi
 from save_data import save_data
@@ -45,12 +46,17 @@ output_dir_mesh = "output/mesh/"
 if not os.path.exists(output_dir_mesh):
     os.makedirs(output_dir_mesh)
 
+output_dir_contour = "output/contour/"
+if not os.path.exists(output_dir_contour):
+    os.makedirs(output_dir_contour)
+
 
 # Opening JSON file
 with open("../../paths.json") as json_file:
     paths = json.load(json_file)
 
-geometry = "eighthsphere"
+# geometry = "eighthsphere"
+geometry = config["simulation"]["Geometry"]
 xdmf_name = geometry + ".xdmf"
 
 
@@ -74,10 +80,17 @@ basal = float(config["parameters"]["contractility_basal"])
 gaussian_width = float(config["parameters"]["contractility_width"])
 kd = float(config["parameters"]["depolymerization"])
 vp = float(config["parameters"]["polymerization"])
+
 nu = float(config["nematics"]["coupling_parameter"])
 gamma = float(config["nematics"]["rotational_viscosity"])
-L_ = float(config["nematics"]["elastic_frank_constant"])
-chi = float(config["nematics"]["inverse_susceptibility"])
+tau = float(config["nematics"]["nematic_relaxation_time"])
+xi = float(config["nematics"]["correlation_length"])
+
+L_ = xi*xi*gamma/tau    # elastic_frank_constant
+chi =  gamma/tau        # inverse_susceptibility
+
+print("elastic_frank_constant", L_)
+print("inverse_susceptibility", chi)
 
 Q_tensor = as_tensor([[1.0 / 6, 0.0], [0.0, 1.0 / 6]])
 q_33 = -1.0 / 3
@@ -194,7 +207,70 @@ while time < Time:
     # print(cwd)
     # write_mesh_from_xdmf(i)
     
+    if i>= 1:
+        # print(problem.mesh.geometry().dim())
+        dofmap_ = problem.V_thickness.tabulate_dof_coordinates()
+        # print("This is thickness",problem.Q_field.vector()[:])
+        # print(len(problem.Q_field.vector()[:]))
 
+        # # ind_t = np.where()
+        # print(len(dofmap_))
+
+        # print("this is dofmap_", dofmap_)
+
+        dofmap = problem.V_thickness.dofmap()
+        nvertices = problem.mesh.ufl_cell().num_vertices()
+
+        # Set up a vertex_2_dof list
+        indices = [dofmap.tabulate_entity_dofs(0, i)[0] for i in range(nvertices)]
+
+        vertex_2_dof = dict()
+        [vertex_2_dof.update(dict(vd for vd in zip(cell.entities(0),
+                                        dofmap.cell_dofs(cell.index())[indices])))
+                        for cell in cells(problem.mesh)]
+        
+
+        # print("Num num_vertices = ",nvertices)
+        X = problem.mesh.coordinates()
+
+        # Set the vertex coordinate you want to modify
+        xcoord, ycoord, zcoord = 0., 1., 0.
+        tol = problem.mesh.rmin()
+        tol = 1e-2
+        # Find the matching vertex (if it exists)
+        vertex_idx = []
+        x_2D = []
+        y_2D = []
+        # Getting the 2D contour
+        for idx, x in enumerate(X):
+            # print(idx,x)
+            if abs(x[2]-zcoord )<tol:
+                x_2D = np.append(x_2D,x[0])
+                y_2D = np.append(y_2D,x[1])
+
+
+            # if (abs(x[0]-xcoord)<tol and abs(x[1] - ycoord) <tol and abs(x[2]-zcoord )<tol):
+            #     vertex_idx = np.append(vertex_idx,idx)
+            #     print("Here's the vertex", vertex_idx)
+
+        # vertex_idx = np.where((X == (xcoord,ycoord, zcoord)).all(axis = 0))[0]
+        # vertex_idx = vertex_idx[0]
+        # print(x_2D, y_2D)        
+        np.savetxt("output/contour/"+str(i)+".txt", np.column_stack((x_2D,y_2D)), delimiter = ";")
+         
+        # try:
+        #     dof_idx = vertex_2_dof[vertex_idx[0]]
+        #     print(dof_idx)
+        #     problem.Q_field.vector()[dof_idx] = 100.
+        #     problem.thickness.vector()[dof_idx] = 1.
+        #     x=1
+        # except:
+        #     print('No matching vertex!')
+
+
+        # print(X)
+
+        # break
     problem.write(
         time + dt,
         u=True,
